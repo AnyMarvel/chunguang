@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 // 拦截器
@@ -36,13 +39,22 @@ class Http {
       ),
     );
 
+    //忽略Https校验
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (HttpClient client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+        return true;
+      };
+    };
+
     // 在调试模式下需要抓包调试，所以我们使用代理，并禁用HTTPS证书校验
     // if (PROXY_ENABLE) {
     //   (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
     //       (client) {
-    //     client.findProxy = (uri) {
-    //       return "PROXY $PROXY_IP:$PROXY_PORT";
-    //     };
+    //     // client.findProxy = (uri) {
+    //     //   return "PROXY $PROXY_IP:$PROXY_PORT";
+    //     // };
     //     //代理工具会提供一个抓包的自签名证书，会通不过证书校验，所以我们禁用证书校验
     //     client.badCertificateCallback =
     //         (X509Certificate cert, String host, int port) => true;
